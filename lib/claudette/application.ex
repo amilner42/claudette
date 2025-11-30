@@ -7,12 +7,15 @@ defmodule Claudette.Application do
 
   @impl true
   def start(_type, _args) do
+    # Ensure data directories exist on startup
+    Claudette.Config.ensure_data_dirs!()
+
     children = [
       ClaudetteWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:claudette, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Claudette.PubSub},
-      # Start a worker by calling: Claudette.Worker.start_link(arg)
-      # {Claudette.Worker, arg},
+      # Persistent terminal session
+      Claudette.Terminal.Session,
       # Start to serve requests, typically the last entry
       ClaudetteWeb.Endpoint
     ]

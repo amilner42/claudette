@@ -17,7 +17,10 @@ defmodule ClaudetteWeb.Router do
   scope "/", ClaudetteWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", DashboardLive, :index
+    live "/projects/:project_id/tasks/:id", TaskLive, :show
+    live "/projects/:project_id/tasks/:id/edit", TaskLive, :edit
+    live "/terminal", TerminalLive, :index
   end
 
   # Other scopes may use custom stacks.
