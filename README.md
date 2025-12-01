@@ -1,18 +1,23 @@
 # Claudette
 
-To start your Phoenix server:
+> ⚠️ This is a WIP and doesn't contain friendly documentation / setup (yet)
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+A simple local-only liveview app that provides a UI to manage claude working in worktrees & cranking on GitHub issues.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+### Setup
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+- Set up your local git worktrees environments (I use 5, `tree1`, `tree2`, ...)
+- `mix setup` -> `mix phx.server` to spin up the liveview app
+- Visit localhost:7070 and add your project config (github token, directories of worktrees)
+- Add some instructions in the `instructions/` folders for context about how you want it to solve the issue.
+- 🎉Done
 
-## Learn more
+### How to use
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+* Click a GitHub issue from the list
+* Assign it a worktree to use
+* Hit "Initialize"
+* Open up claude code in that worktree directory and run the command it'll give you, like: `/claudette be83c4ab/e2c36f73`
+* Repeat on other issues in different workspaces.
+* When issues are solved, you can mark them as done in the UI and it'll safely clean up the worktree. You can now use this worktree for another GitHub issue.
+* 🔁 Repeat.
