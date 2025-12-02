@@ -1150,7 +1150,7 @@ defmodule ClaudetteWeb.DashboardLive do
     <!-- Main Dashboard -->
       <%= if @current_project do %>
         <div class="h-full flex flex-col">
-
+          
     <!-- Error message -->
           <%= if @github_error do %>
             <div class="flex-shrink-0 px-4 py-2 bg-red-900/30 border-b border-red-800 text-red-300 text-sm">
@@ -1203,15 +1203,13 @@ defmodule ClaudetteWeb.DashboardLive do
                                   <span class={"px-2 py-0.5 text-xs rounded #{status_color(task.status)}"}>
                                     {task.status}
                                   </span>
-                                  <%
-                                    # Get issue number from field or parse from github_url
-                                    issue_number = task.github_issue_number || (
+                                  <% # Get issue number from field or parse from github_url
+                                  issue_number =
+                                    task.github_issue_number ||
                                       case parse_github_url(task.github_url || "") do
                                         {_, _, num} -> num
                                         _ -> nil
-                                      end
-                                    )
-                                  %>
+                                      end %>
                                   <%= if issue_number do %>
                                     <span class="text-gray-500 text-sm">
                                       #{issue_number}
@@ -1219,15 +1217,14 @@ defmodule ClaudetteWeb.DashboardLive do
                                   <% end %>
                                 </div>
                                 <%= if task.github_url do %>
-                                  <%
-                                    # Parse github_url to get owner, repo, issue_number for link
-                                    {owner, repo, issue_num} =
-                                      if task.github_owner && task.github_repo && task.github_issue_number do
-                                        {task.github_owner, task.github_repo, task.github_issue_number}
-                                      else
-                                        parse_github_url(task.github_url)
-                                      end
-                                  %>
+                                  <% # Parse github_url to get owner, repo, issue_number for link
+                                  {owner, repo, issue_num} =
+                                    if task.github_owner && task.github_repo &&
+                                         task.github_issue_number do
+                                      {task.github_owner, task.github_repo, task.github_issue_number}
+                                    else
+                                      parse_github_url(task.github_url)
+                                    end %>
                                   <%= if owner && repo && issue_num do %>
                                     <a
                                       href={"https://github.com/#{owner}/#{repo}/issues/#{issue_num}"}
@@ -1265,33 +1262,34 @@ defmodule ClaudetteWeb.DashboardLive do
                                   </h3>
                                 <% end %>
                                 <div class="flex items-center gap-2 mt-1">
-                                  <%= if task.worktree_path do %>
-                                    <span class="flex items-center gap-1 text-xs">
-                                      <span class={"w-1.5 h-1.5 rounded-full #{if task.status == "active", do: "bg-yellow-500", else: "bg-gray-500"}"}></span>
-                                      <span class="text-gray-500 font-mono">
-                                        {Path.basename(task.worktree_path)}
-                                      </span>
-                                    </span>
-                                  <% end %>
                                   <span class="text-gray-500 text-xs">
                                     Updated {format_time(task.updated_at)}
                                   </span>
                                 </div>
                               </div>
-                              <svg
-                                class="w-5 h-5 text-gray-600 group-hover:text-gray-400 transition flex-shrink-0 ml-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
+                              <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                                <%= if task.worktree_path do %>
+                                  <span class="flex items-center gap-1.5 text-gray-400 text-sm font-mono">
+                                    <span class={"w-2 h-2 rounded-full #{if task.status == "active", do: "bg-green-500", else: "bg-gray-500"}"}>
+                                    </span>
+                                    {Path.basename(task.worktree_path)}
+                                  </span>
+                                <% end %>
+                                <svg
+                                  class="w-5 h-5 text-gray-600 group-hover:text-gray-400 transition flex-shrink-0"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                  />
+                                </svg>
+                              </div>
                             </div>
                           </button>
                         <% {:issue, issue} -> %>
@@ -1443,86 +1441,8 @@ defmodule ClaudetteWeb.DashboardLive do
                           <!-- Task Details -->
                           <h2 class="text-lg font-semibold text-white mb-4">Issue Details</h2>
                           <div class="space-y-4">
-                            <!-- Task Header -->
+                            <!-- Claude Command -->
                             <div>
-                              <div class="flex items-center gap-2 mb-2">
-                                <span class="px-2 py-0.5 text-xs rounded bg-gray-700 text-gray-300">
-                                  Issue
-                                </span>
-                                <span class={"px-2 py-0.5 text-xs rounded #{status_color(@selected_task.status)}"}>
-                                  {@selected_task.status}
-                                </span>
-                              </div>
-                              <%= if @selected_task.github_url do %>
-                                <%
-                                  # Parse github_url to get owner, repo, issue_number for link
-                                  {owner, repo, issue_num} =
-                                    if @selected_task.github_owner && @selected_task.github_repo && @selected_task.github_issue_number do
-                                      {@selected_task.github_owner, @selected_task.github_repo, @selected_task.github_issue_number}
-                                    else
-                                      parse_github_url(@selected_task.github_url)
-                                    end
-                                %>
-                                <%= if owner && repo && issue_num do %>
-                                  <a
-                                    href={"https://github.com/#{owner}/#{repo}/issues/#{issue_num}"}
-                                    target="_blank"
-                                    class="text-xl font-bold text-white hover:text-indigo-400 hover:underline inline-flex items-center gap-2 transition"
-                                  >
-                                    {@selected_task.title}
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      class="w-4 h-4 opacity-50"
-                                    >
-                                      <path
-                                        fill-rule="evenodd"
-                                        d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
-                                        clip-rule="evenodd"
-                                      />
-                                      <path
-                                        fill-rule="evenodd"
-                                        d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z"
-                                        clip-rule="evenodd"
-                                      />
-                                    </svg>
-                                  </a>
-                                <% else %>
-                                  <h3 class="text-xl font-bold text-white">{@selected_task.title}</h3>
-                                <% end %>
-                              <% else %>
-                                <h3 class="text-xl font-bold text-white">{@selected_task.title}</h3>
-                              <% end %>
-                              <%= if @selected_task.github_url do %>
-                                <%
-                                  # Parse github_url for the GitHub URL link
-                                  {gh_owner, gh_repo, gh_issue_num} =
-                                    if @selected_task.github_owner && @selected_task.github_repo && @selected_task.github_issue_number do
-                                      {@selected_task.github_owner, @selected_task.github_repo, @selected_task.github_issue_number}
-                                    else
-                                      parse_github_url(@selected_task.github_url)
-                                    end
-                                %>
-                                <div class="text-sm text-gray-500 mt-1">
-                                  <span class="text-green-400">GitHub:</span>
-                                  <%= if gh_owner && gh_repo && gh_issue_num do %>
-                                    <a
-                                      href={"https://github.com/#{gh_owner}/#{gh_repo}/issues/#{gh_issue_num}"}
-                                      target="_blank"
-                                      class="hover:text-indigo-400 hover:underline transition"
-                                    >
-                                      {@selected_task.github_url}
-                                    </a>
-                                  <% else %>
-                                    {@selected_task.github_url}
-                                  <% end %>
-                                </div>
-                              <% end %>
-                            </div>
-                            
-    <!-- Claude Command -->
-                            <div class="pt-3 border-t border-gray-800">
                               <label class="block text-sm font-medium text-gray-400 mb-2">
                                 Claude Command
                               </label>
@@ -1541,18 +1461,19 @@ defmodule ClaudetteWeb.DashboardLive do
                               </div>
                             </div>
                             
-    <!-- Worktree Configuration -->
-                            <%= if @selected_task.worktree_path || @selected_task.branch_name do %>
+    <!-- Configuration -->
+                            <%= if @selected_task.worktree_path || @selected_task.branch_name || @selected_task.instruction_template || (@selected_task.context_md && @selected_task.context_md != "") do %>
                               <div class="pt-3 border-t border-gray-800">
                                 <h3 class="text-sm font-medium text-gray-400 mb-2">
-                                  Worktree Configuration
+                                  Configuration
                                 </h3>
                                 <dl class="space-y-2 text-sm">
                                   <%= if @selected_task.worktree_path do %>
                                     <div class="flex justify-between">
                                       <dt class="text-gray-500">Workspace:</dt>
-                                      <dd class="text-gray-300 font-mono flex items-center gap-1">
-                                        <span class={"w-1.5 h-1.5 rounded-full #{if @selected_task.status == "active", do: "bg-yellow-500", else: "bg-gray-500"}"}></span>
+                                      <dd class="flex items-center gap-1.5 text-gray-400 font-mono">
+                                        <span class={"w-2 h-2 rounded-full #{if @selected_task.status == "active", do: "bg-green-500", else: "bg-gray-500"}"}>
+                                        </span>
                                         {Path.basename(@selected_task.worktree_path)}
                                       </dd>
                                     </div>
@@ -1565,26 +1486,26 @@ defmodule ClaudetteWeb.DashboardLive do
                                       </dd>
                                     </div>
                                   <% end %>
+                                  <%= if @selected_task.instruction_template do %>
+                                    <div class="flex justify-between">
+                                      <dt class="text-gray-500">Instruction Template:</dt>
+                                      <dd class="text-gray-300 text-right max-w-xs truncate">
+                                        {@selected_task.instruction_template}
+                                      </dd>
+                                    </div>
+                                  <% end %>
+                                  <%= if @selected_task.context_md && @selected_task.context_md != "" do %>
+                                    <div>
+                                      <dt class="text-gray-500 mb-2">Context:</dt>
+                                      <dd>
+                                        <pre class="bg-gray-800 p-3 rounded text-gray-300 text-xs whitespace-pre-wrap max-h-48 overflow-y-auto"><%= @selected_task.context_md %></pre>
+                                      </dd>
+                                    </div>
+                                  <% end %>
                                 </dl>
                               </div>
                             <% end %>
                             
-    <!-- Context -->
-                            <%= if @selected_task.context_md && @selected_task.context_md != "" do %>
-                              <div class="pt-3 border-t border-gray-800">
-                                <h3 class="text-sm font-medium text-gray-400 mb-2">Context</h3>
-                                <pre class="bg-gray-800 p-3 rounded text-gray-300 text-xs whitespace-pre-wrap max-h-48 overflow-y-auto"><%= @selected_task.context_md %></pre>
-                              </div>
-                            <% end %>
-                            
-    <!-- Timestamps -->
-                            <div class="pt-3 border-t border-gray-800 text-xs text-gray-500">
-                              <div class="flex justify-between">
-                                <span>Created: {format_time(@selected_task.created_at)}</span>
-                                <span>Updated: {format_time(@selected_task.updated_at)}</span>
-                              </div>
-                            </div>
-
     <!-- Actions -->
                             <%= if @selected_task.status == "active" && @selected_task.worktree_path do %>
                               <div class="pt-3 border-t border-gray-800">
